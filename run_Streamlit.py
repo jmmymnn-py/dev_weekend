@@ -225,6 +225,7 @@ def run_Streamlit():
     df_Master = loadCache_into_Streamlit(force=force_refresh, days_out=days_out)
 
     for date, group in df_Master.groupby(df_Master["Start DateTime"].dt.date):
-        st.header(date.strftime("%A, %B %d"))
+        st.markdown("----")
+        st.header("📅 " + date.strftime("%A, %B %d"))
         for _, row in group.iterrows():
             print_event(row)
