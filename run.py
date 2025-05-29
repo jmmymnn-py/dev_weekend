@@ -58,13 +58,13 @@ def get_last_updated():
 st.set_page_config(layout="wide", page_title="Upcoming Shows")
 st.title("Upcoming Shows")
 st.caption("Live scraped from Eli's Mile High Club, Thee Stork Club, 924 Gilman.")
-
+st.caption("See ya in the crowd! IG:jimmyhadalittlelamb")
 # Controls
 col1, col2 = st.columns([4, 1])
 with col1:
     last_updated = get_last_updated()
     if last_updated:
-        st.caption(f"Last updated: {last_updated.strftime('%b %d, %Y %I:%M %p')}")
+        st.caption(f"/nLast updated: {last_updated.strftime('%b %d, %Y %I:%M %p')}")
     else:
         st.caption("No cached timestamp found.")
 with col2:
