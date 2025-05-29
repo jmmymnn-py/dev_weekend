@@ -186,8 +186,7 @@ def print_event(row):
                         j += 1
                     emoji = location_to_emoji(loc)
                     bullets.append(
-                        f"<li><b>{band.strip()} {emoji}</b> ({loc}): "
-                        f"<a href='{url}' target='_blank'>{url}</a>"
+                        f"<li><b>{band.strip()} | <a href='{url}' target='_blank'>{url}</a> | {emoji} </b>- {loc} "
                         f"<ul style='margin-left:1.5em; list-style-type:circle;'>"
                         f"<li>{tags}</li></ul></li>"
                     )
