@@ -161,7 +161,9 @@ def print_event(row):
 
             st.text(f"📍 {row.get('Venue', '')}")
             st.text(f"🕗 {row['Start DateTime'].strftime('%I:%M %p')}")
-            st.markdown("----")
+            if row.get("Event URL"):
+                st.markdown(f"[🎟 Get Tickets]({row['Event URL']})", unsafe_allow_html=True)
+            # st.markdown("----")
             more_info = row.get("More Info", "")
             if pd.isna(more_info) or not more_info.strip():
                 st.markdown("**More Info:** Bandcamp not found")
@@ -186,19 +188,18 @@ def print_event(row):
                         j += 1
                     emoji = location_to_emoji(loc)
                     bullets.append(
-                        f"<li><b>{band.strip()} | <a href='{url}' target='_blank'>{url}</a> | {emoji} </b>- {loc} "
+                        f"<li><b>{band.strip()} | <a href='{url}' target='_blank'>{url[8:]}</a> | {emoji} </b>- {loc} "
                         f"<ul style='margin-left:1.5em; list-style-type:circle;'>"
                         f"<li>{tags}</li></ul></li>"
                     )
                     i = j
                 else:
                     i += 1
-            st.markdown("**More Info:**<br><ul>" + "".join(bullets) + "</ul>", unsafe_allow_html=True)
+            st.markdown("Band Info:" + "".join(bullets) + "</ul>", unsafe_allow_html=True)
 
 
 
-            if row.get("Event URL"):
-                st.markdown(f"[🎟 Buy Tickets]({row['Event URL']})", unsafe_allow_html=True)
+
 
 
 def run_Streamlit():
