@@ -141,14 +141,23 @@ def print_event(row):
     with st.container():
         cols = st.columns([2, 4])
         with cols[0]:
-            st.caption(f"{row.get('Event Genres', 'unknown')}")  # NEW line
+            genre = f"{row.get('Event Genres', 'unknown')}"
+            if genre == "unknown":
+                st.caption("")  
+            else:
+                st.caption(genre)
+            
             image_url = row.get("Image URL", "")
             if pd.notna(image_url) and image_url:
                 st.image(image_url, use_container_width=True)
 
 
         with cols[1]:
-            st.subheader("🎤 " + row["Headliner"])
+            if row.get('Event Genres', 'unknown') == "unknown":
+                st.subheader("🍻 " + row["Headliner"])
+
+            else:
+                st.subheader("🎤 " + row["Headliner"])
 
             support_bands = [
                 row.get("Supporting Band 1", ""),
@@ -168,34 +177,41 @@ def print_event(row):
             if pd.isna(more_info) or not more_info.strip():
                 st.markdown("**More Info:** Bandcamp not found")
             else:
-                # ── format each band as a bullet plus an indented tags sub-bullet ──
+            # ── format each band line ───────────────────────────────
                 lines   = [ln.strip() for ln in more_info.strip().split("\n") if ln.strip()]
                 bullets = []
                 i = 0
-            while i < len(lines):
-                line = lines[i]
-                if ":" in line and ".bandcamp.com" in line:
-                    band, url = line.split(":", 1)
-                    url = url.strip()
-                    loc, tags = "N/A", "N/A"
-                    j = i + 1
-                    while j < len(lines) and ".bandcamp.com" not in lines[j]:
-                        low = lines[j].lower()
-                        if low.startswith("location:"):
-                            loc = lines[j].split(":", 1)[1].strip()
-                        elif low.startswith("tags:"):
-                            tags = lines[j].split(":", 1)[1].strip()
-                        j += 1
-                    emoji = location_to_emoji(loc)
-                    bullets.append(
-                        f"<li><b>{band.strip()} | <a href='{url}' target='_blank'>{url[8:]}</a> | {emoji} </b>- {loc} "
-                        f"<ul style='margin-left:1.5em; list-style-type:circle;'>"
-                        f"<li>{tags}</li></ul></li>"
-                    )
-                    i = j
-                else:
-                    i += 1
-            st.markdown("Band Info:" + "".join(bullets) + "</ul>", unsafe_allow_html=True)
+                while i < len(lines):
+                    line = lines[i]
+                    if ":" in line and ".bandcamp.com" in line:
+                        band, url = line.split(":", 1)
+                        url = url.strip()
+                        loc, tags = "N/A", "N/A"
+                        j = i + 1
+                        while j < len(lines) and ".bandcamp.com" not in lines[j]:
+                            low = lines[j].lower()
+                            if low.startswith("location:"):
+                                loc  = lines[j].split(":", 1)[1].strip()
+                            elif low.startswith("tags:"):
+                                tags = lines[j].split(":", 1)[1].strip()
+                            j += 1
+
+                        emoji = location_to_emoji(loc)
+
+                        #  ▼ outer item: bullet suppressed  ▼
+                        bullets.append(
+                            f"<li style='list-style-type:none;'>"
+                            f"<b>{band.strip()}</b> | "
+                            f"<a href='{url}' target='_blank'>{url[8:]}</a> | "
+                            f"{emoji} {loc}"
+                            # inner list keeps bullets
+                            f"<ul style='margin-left:0;padding-left:0;list-style-type:circle;'>"                            
+                            f"<li>{tags}</li></ul></li>"
+                        )
+                        i = j
+                    else:
+                        i += 1
+            st.markdown("" + "".join(bullets) + "</ul>", unsafe_allow_html=True)
 
 
 
