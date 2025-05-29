@@ -2,15 +2,7 @@ import pandas as pd
 import pytz
 import streamlit as st
 from datetime import datetime, timedelta
-
-from cache import create_cache, read_cache, when_updated
-
-
-import pandas as pd
-import pytz
-import streamlit as st
-from datetime import datetime, timedelta
-
+from collections import Counter
 from cache import create_cache, read_cache, when_updated
 
 # ----------------------------------------------------------------------
@@ -89,16 +81,17 @@ def print_Header():
     st.title("Upcoming Shows")
     st.caption("Live scraped from Eli's Mile High Club, Thee Stork Club, 924 Gilman.")
     st.caption("See ya in the crowd! 📸 @jimmyhadalittlelamb")
+    changelog = "Bandcamp Scrape is experimental -- may not be correct"
 
     col1, col2 = st.columns([4, 1])
     with col1:
         last_updated = when_updated()
         if last_updated:
-            st.caption(f"Last updated: {last_updated.strftime('%b %d, %Y %I:%M %p')}")
+            st.caption(f"Last updated: {last_updated.strftime('%b %d, %Y %I:%M %p')}"+ f" | {changelog}")
         else:
-            st.caption("No cached timestamp found.")
+            st.caption("No cached timestamp found. "+ f" | {changelog}")
     return col2
-from collections import Counter
+
 
 def infer_event_genres(df, top_n=3):
     """
@@ -153,12 +146,13 @@ def print_event(row):
 
 
         with cols[1]:
+            # EVENT Title -------------------------------------------#
             if row.get('Event Genres', 'unknown') == "unknown":
                 st.subheader("🍻 " + row["Headliner"])
 
             else:
                 st.subheader("🎤 " + row["Headliner"])
-
+            ## EVENT Supporting Acts -------------------------------------------#
             support_bands = [
                 row.get("Supporting Band 1", ""),
                 row.get("Supporting Band 2", ""),
@@ -166,18 +160,18 @@ def print_event(row):
             ]
             support = ", ".join([b for b in support_bands if pd.notna(b) and b.strip()])
             if support:
-                st.text(f"➕ Supporting: {support}")
-
+                st.markdown(f"➕ Supporting: **{support}**")
+            ## EVENT Details - Venue, Time, Ticket Url-------------------------------------------#
             st.text(f"📍 {row.get('Venue', '')}")
             st.text(f"🕗 {row['Start DateTime'].strftime('%I:%M %p')}")
             if row.get("Event URL"):
                 st.markdown(f"[🎟 Get Tickets]({row['Event URL']})", unsafe_allow_html=True)
-            # st.markdown("----")
+            ## EVENT More Info - Bandcamp Results-------------------------------------------#
             more_info = row.get("More Info", "")
             if pd.isna(more_info) or not more_info.strip():
                 st.markdown("**More Info:** Bandcamp not found")
             else:
-            # ── format each band line ───────────────────────────────
+
                 lines   = [ln.strip() for ln in more_info.strip().split("\n") if ln.strip()]
                 bullets = []
                 i = 0
@@ -197,26 +191,19 @@ def print_event(row):
                             j += 1
 
                         emoji = location_to_emoji(loc)
-
-                        #  ▼ outer item: bullet suppressed  ▼
                         bullets.append(
                             f"<li style='list-style-type:none;'>"
                             f"<b>{band.strip()}</b> | "
-                            f"<a href='{url}' target='_blank'>{url[8:]}</a> | "
-                            f"{emoji} {loc}"
+                            f"<a href='{url}' target='_blank'>{url[8:]}</a>"
+
                             # inner list keeps bullets
                             f"<ul style='margin-left:0;padding-left:0;list-style-type:circle;'>"                            
-                            f"<li>{tags}</li></ul></li>"
+                            f"<li>{emoji} {loc} <i>[{tags}]</i></li></ul></li>"
                         )
                         i = j
                     else:
                         i += 1
             st.markdown("" + "".join(bullets) + "</ul>", unsafe_allow_html=True)
-
-
-
-
-
 
 def run_Streamlit():
     col2 = print_Header()
