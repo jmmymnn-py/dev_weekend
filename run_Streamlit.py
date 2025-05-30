@@ -79,10 +79,11 @@ def location_to_emoji(location: str) -> str:
 def print_Header():
     st.set_page_config(layout="wide", page_title="Upcoming Shows")
     # st.title("Upcoming Shows")
-    st.markdown("###### Live scraped from Eli's Mile High Club, Thee Stork Club, 924 Gilman, Tamarack.")
+    st.markdown("###### updates:")
+    st.markdown("###### -- emhc vs. paperwork -> fundraiser: www.gofundme.com/f/keep-elis-mile-high-club-alive-in-oakland")
     st.markdown(
-        'see ya in the crowd! '
-        '<span style="background-color:#3b3b3b; color:#000000; '
+        '📷 see ya in the crowd! '
+        '<span style="background-color:#000000; color:#000000; '
         'padding:2px 4px; border-radius:3px;">'
         '<a href="https://www.instagram.com/jimmyhadalittlelamb/" '
         'style="color:#00FF00; text-decoration:none;">'
@@ -90,8 +91,8 @@ def print_Header():
         '</span>',
         unsafe_allow_html=True
     )
-
-    changelog = "bandcamp scrape is experimental -- may not be correct"
+    st.caption("scraping events from: Eli's Mile High Club, Thee Stork Club, 924 Gilman, Tamarack.")
+    changelog = "Bandcamp info can be wrong\n(bc it just grabs first search result 🎲)"
 
     col1, col2 = st.columns([4, 1])
     with col1:
@@ -310,7 +311,7 @@ def run_Streamlit():
     # — now render that entire list, safe from mutation —
     for current in st.session_state.displayed_dates:
         st.markdown("----")
-        st.header("📅 " + current.strftime("%A, %B %d"))
+        st.header((current.strftime("%A, %B %d")).lower())
 
         if current not in grouped:
             st.markdown(f"**Nothing {current.strftime('%A')}**")
