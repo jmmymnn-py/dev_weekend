@@ -115,19 +115,36 @@ def infer_event_genres(df, top_n=3):
     df["Event Genres"] = inferred
     return df
 
-
-def loadCache_into_Streamlit(force=False, days_out=7):
+#### TESTING ####
+#### TESTING ####
+def loadCache_into_Streamlit(force=False, days_out=30):
     df = create_cache() if force else read_cache()
-    df["Start DateTime"] = pd.to_datetime(df["Start DateTime"], errors='coerce')
-    df = df.dropna(subset=["Start DateTime"])
-    df = df.sort_values("Start DateTime")
+    df["Start DateTime"] = pd.to_datetime(df["Start DateTime"], errors="coerce")
+    df = df.dropna(subset=["Start DateTime"]).sort_values("Start DateTime")
     df = infer_event_genres(df)
 
-    local_tz = df["Start DateTime"].dt.tz or pytz.timezone("America/Los_Angeles")
-    today = datetime.combine(datetime.today(), datetime.min.time()).astimezone(local_tz)
+    tz = pytz.timezone("America/Los_Angeles")
+    today = datetime.now(tz).replace(hour=0, minute=0, second=0, microsecond=0)
     cutoff = today + timedelta(days=days_out)
     return df[df["Start DateTime"].between(today, cutoff)]
 
+#### TESTING ####
+#### TESTING ####
+
+##---# loadCache_into_streamlit stable
+#---## STABLE ##---##
+# def loadCache_into_Streamlit(force=False, days_out=7):
+#     df = create_cache() if force else read_cache()
+#     df["Start DateTime"] = pd.to_datetime(df["Start DateTime"], errors='coerce')
+#     df = df.dropna(subset=["Start DateTime"])
+#     df = df.sort_values("Start DateTime")
+#     df = infer_event_genres(df)
+
+#     local_tz = df["Start DateTime"].dt.tz or pytz.timezone("America/Los_Angeles")
+#     today = datetime.combine(datetime.today(), datetime.min.time()).astimezone(local_tz)
+#     cutoff = today + timedelta(days=days_out)
+#     return df[df["Start DateTime"].between(today, cutoff)]
+#---## STABLE ##---##
 
 def print_event(row):
     st.markdown("---")
@@ -205,14 +222,89 @@ def print_event(row):
                         i += 1
             st.markdown("" + "".join(bullets) + "</ul>", unsafe_allow_html=True)
 
+#### TESTING ####
+#### TESTING ####
+def append_day():
+    last = st.session_state.displayed_dates[-1]
+    next_day = last + timedelta(days=1)
+    # maximum 30‑day window from the first date
+    cutoff = st.session_state.displayed_dates[0] + timedelta(days=29)
+    if next_day <= cutoff:
+        st.session_state.displayed_dates.append(next_day)
+
 def run_Streamlit():
+    # — header & refresh button (unchanged)
     col2 = print_Header()
     force_refresh = col2.button("🔁 Force Refresh")
-    days_out = st.slider("Show events up to how many days from today?", min_value=1, max_value=30, value=7)
-    df_Master = loadCache_into_Streamlit(force=force_refresh, days_out=days_out)
 
-    for date, group in df_Master.groupby(df_Master["Start DateTime"].dt.date):
+    # — load 30‑day cache & group by date
+    df_Master = loadCache_into_Streamlit(force=force_refresh)
+    grouped = {
+        d: g for d, g in df_Master.groupby(df_Master["Start DateTime"].dt.date)
+    }
+
+    # — initialize displayed_dates once —
+    if "displayed_dates" not in st.session_state:
+        tz = pytz.timezone("America/Los_Angeles")
+        today = datetime.now(tz).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        ).date()
+        days_to_mon = ((0 - today.weekday() + 7) % 7) or 7
+        mon = today + timedelta(days=days_to_mon)
+        st.session_state.displayed_dates = [
+            today + timedelta(days=i) for i in range((mon - today).days + 1)
+        ]
+
+    # — compute our 30‑day cap —
+    start = st.session_state.displayed_dates[0]
+    cap = start + timedelta(days=29)
+
+    # — auto‑append until the last displayed date has events or we hit cap —
+    while (
+        st.session_state.displayed_dates[-1] not in grouped
+        and st.session_state.displayed_dates[-1] < cap
+    ):
+        # just tack on the next calendar day
+        st.session_state.displayed_dates.append(
+            st.session_state.displayed_dates[-1] + timedelta(days=1)
+        )
+
+    # — now render that entire list, safe from mutation —
+    for current in st.session_state.displayed_dates:
         st.markdown("----")
-        st.header("📅 " + date.strftime("%A, %B %d"))
-        for _, row in group.iterrows():
-            print_event(row)
+        st.header("📅 " + current.strftime("%A, %B %d"))
+
+        if current not in grouped:
+            st.markdown(f"**Nothing {current.strftime('%A')}**")
+        else:
+            for _, row in grouped[current].iterrows():
+                print_event(row)
+
+    # — bottom UI: either show “Last day available” or the +Day button —
+    if st.session_state.displayed_dates[-1] >= cap:
+        st.markdown("**Last day available**")
+    else:
+        st.button(
+            "\+ day",
+            on_click=append_day,
+            type="primary",
+            use_container_width=True,
+        )
+
+#### TESTING ####
+#### TESTING ####
+
+# run_Streamlit table is below - comment out when testing
+# #---## STABLE ##---##
+# def run_Streamlit():
+#     col2 = print_Header()
+#     force_refresh = col2.button("🔁 Force Refresh")
+#     days_out = st.slider("Show events up to how many days from today?", min_value=1, max_value=30, value=7)
+#     df_Master = loadCache_into_Streamlit(force=force_refresh, days_out=days_out)
+
+#     for date, group in df_Master.groupby(df_Master["Start DateTime"].dt.date):
+#         st.markdown("----")
+#         st.header("📅 " + date.strftime("%A, %B %d"))
+#         for _, row in group.iterrows():
+#             print_event(row)
+#---## STABLE ##---##
