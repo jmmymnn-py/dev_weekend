@@ -79,7 +79,7 @@ def location_to_emoji(location: str) -> str:
 def print_Header():
     st.set_page_config(layout="wide", page_title="Upcoming Shows")
     # st.title("Upcoming Shows")
-    st.caption("Live scraped from Eli's Mile High Club, Thee Stork Club, 924 Gilman, Tamarack.")
+    st.text("Live scraped from Eli's Mile High Club, Thee Stork Club, 924 Gilman, Tamarack.")
     st.caption("See ya in the crowd! 📸 @jimmyhadalittlelamb")
     changelog = "Bandcamp Scrape is experimental -- may not be correct"
 
