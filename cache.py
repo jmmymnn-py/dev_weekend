@@ -6,6 +6,7 @@ import streamlit as st
 from scrape_Gilman import scrape_Gilman
 from scrape_Elis import scrape_Elis
 from scrape_Stork import scrape_Stork
+from scrape_Tamarack import scrape_Tamarack
 from combine import combine
 from enrich import enrich
 
@@ -49,8 +50,11 @@ def create_cache():
     update_progress("Scraping Stork...", step=10)
     list_scrapeDFs.append(scrape_Stork())
 
-    update_progress("Scraping Elis...", step=10)
+    update_progress("Scraping Eli's...", step=10)
     list_scrapeDFs.append(scrape_Elis())
+
+    update_progress("Scraping Tamarack...", step=10)
+    list_scrapeDFs.append(scrape_Tamarack())
 
     update_progress("Merging Events...", step=10)
     df = combine(*list_scrapeDFs)
