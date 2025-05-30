@@ -80,16 +80,26 @@ def print_Header():
     st.set_page_config(layout="wide", page_title="Upcoming Shows")
     # st.title("Upcoming Shows")
     st.markdown("###### Live scraped from Eli's Mile High Club, Thee Stork Club, 924 Gilman, Tamarack.")
-    st.caption("See ya in the crowd! :blue-background[📸 @jimmyhadalittlelamb]")
-    changelog = "Bandcamp Scrape is experimental -- may not be correct"
+    st.markdown(
+        'see ya in the crowd! '
+        '<span style="background-color:#3b3b3b; color:#000000; '
+        'padding:2px 4px; border-radius:3px;">'
+        '<a href="https://www.instagram.com/jimmyhadalittlelamb/" '
+        'style="color:#00FF00; text-decoration:none;">'
+        '@jimmyhadalittlelamb</a>'
+        '</span>',
+        unsafe_allow_html=True
+    )
+
+    changelog = "bandcamp scrape is experimental -- may not be correct"
 
     col1, col2 = st.columns([4, 1])
     with col1:
         last_updated = when_updated()
         if last_updated:
-            st.caption(f"Last updated: {last_updated.strftime('%b %d, %Y %I:%M %p')}"+ f" | {changelog}")
+            st.caption(f"last updated: {last_updated.strftime('%b %d, %Y %I:%M %p')}"+ f" | {changelog}")
         else:
-            st.caption("No cached timestamp found. "+ f" | {changelog}")
+            st.caption("no cached timestamp found. "+ f" | {changelog}")
     return col2
 
 

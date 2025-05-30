@@ -1,0 +1,10 @@
+[theme]
+primaryColor = "#006400"   
+backgroundColor = "#000000"            # pure black
+secondaryBackgroundColor = "#111111"   # very dark grey for panels
+textColor = "#FFFFFF"                  # white text
+
+
+# Font: "sans serif", "serif", or "monospace"
+# (Maps to Open Sans, Merriweather, Fira Code respectively)
+font = "monospace"
