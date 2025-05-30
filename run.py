@@ -6,12 +6,12 @@ import pytz
 
 ## Importing functions ---------------------------------------------------------------------##
 
-import scrape_Gilman
-import scrape_Elis
-import scrape_Stork
-import combine
-import enrich
-import cache
+from scrape_Gilman import *
+from scrape_Elis import *
+from scrape_Stork import *
+from combine import *
+from enrich import *
+from cache import *
 from run_Streamlit import run_Streamlit
 
 CACHE_FILE = "cached_df.csv"
