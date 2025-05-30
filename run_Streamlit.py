@@ -243,17 +243,45 @@ def run_Streamlit():
         d: g for d, g in df_Master.groupby(df_Master["Start DateTime"].dt.date)
     }
 
+
+
+#### TESTING ######
     # — initialize displayed_dates once —
     if "displayed_dates" not in st.session_state:
         tz = pytz.timezone("America/Los_Angeles")
         today = datetime.now(tz).replace(
             hour=0, minute=0, second=0, microsecond=0
         ).date()
-        days_to_mon = ((0 - today.weekday() + 7) % 7) or 7
-        mon = today + timedelta(days=days_to_mon)
-        st.session_state.displayed_dates = [
-            today + timedelta(days=i) for i in range((mon - today).days + 1)
-        ]
+
+        dates = []
+        current = today
+
+        # keep adding days until we append a Monday
+        while True:
+            dates.append(current)
+            # weekday()==0 → Monday
+            if current.weekday() == 0:
+                break
+            current += timedelta(days=1)
+
+        st.session_state.displayed_dates = dates
+##### TESTING ####
+
+
+# stable initalizer ## 
+### STABLE ####
+    # — initialize displayed_dates once —
+    # if "displayed_dates" not in st.session_state:
+    #     tz = pytz.timezone("America/Los_Angeles")
+    #     today = datetime.now(tz).replace(
+    #         hour=0, minute=0, second=0, microsecond=0
+    #     ).date()
+    #     days_to_mon = ((0 - today.weekday() + 7) % 7) or 7
+    #     mon = today + timedelta(days=days_to_mon)
+    #     st.session_state.displayed_dates = [
+    #         today + timedelta(days=i) for i in range((mon - today).days + 1)
+    #     ]
+#### STABLE #### 
 
     # — compute our 30‑day cap —
     start = st.session_state.displayed_dates[0]
